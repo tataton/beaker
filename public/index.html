@@ -5,13 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-    <script>if (window.location.protocol === "http:") window.location.protocol = "https:";</script>
-    <script src="/vendors/annyang.min.js"></script>
-    <script src="/vendors/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
     <title>B.E.A.K.E.R.</title>
+    <script type="text/javascript" src="vendors/annyang.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="vendors/angular.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="scripts/client.js" charset="utf-8"></script>
   </head>
-  <body>
-    <h1>Hello World!</h1>
-  </body>
+<body ng-app="myApp">
+  <main ng-controller="MainController">
+    <h1>B.E.A.K.E.R.</h1>
+    {{sourced}}
+    {{factorysourced}}
+  </main>
+</body>
 </html>

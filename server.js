@@ -1,7 +1,8 @@
 var fs = require('fs');
 var https = require('https');
-var http = require('http');
+// var http = require('http');
 var https_port = process.env.PORT || 8080;
+// var http_port = process.env.PORT || 8080;
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -19,6 +20,11 @@ var sslOptions = {
 
 https.createServer(sslOptions, app).listen(https_port);
 console.log('Server listening on port ' + https_port + '.');
+
+// HTTP setup
+// app.listen(8080, function() {
+//   console.log('Server listening on port ' + http_port + '.');
+// });
 
 // Routes
 var index = require('./routers/index');
