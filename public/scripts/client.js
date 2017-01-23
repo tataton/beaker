@@ -1,25 +1,33 @@
-console.log('js sourced!');
+var socket = io();
 
-var myApp = angular.module('myApp', []);
+var myApp = angular.module('myApp', ['ngRoute']);
 
 myApp.factory('AnnyangService', function($rootScope){
+  /* Adadpted from Levi Thomason's angular-annyang
+  (https://github.com/levithomason/angular-annyang). This
+  factory is specifically devoted to making annyang
+  available across angular controllers. */
+
   var service = {};
-  
-  // COMMANDS
+
   service.commands = {};
+  /* Command array; do not pre-populate. New commands need
+  to be added through the addCommands route, so that their
+  annyang properties can be bound to $rootScope. */
 
   service.addCommand = function(phrase, callback){
     var command = {};
 
-    // Wrap annyang command in scope apply
+    // Wrap annyang command in scope apply:
     command[phrase] = function(args){
       $rootScope.$apply(callback(args));
     };
 
-    // Extend our commands list
+    /* Extend our commands list (copy enumerable properties)
+    of command to service.commands): */
     angular.extend(service.commands, command);
 
-    // Add the commands to annyang
+    // Add the commands to annyang:
     annyang.addCommands(service.commands);
     console.debug('added command "' + phrase + '"', service.commands);
   };
@@ -33,7 +41,11 @@ myApp.factory('AnnyangService', function($rootScope){
   return service;
 });
 
-myApp.controller("MainController", ["$scope", "$http", "AnnyangService", function($scope, $http, AnnyangService){
+myApp.controller("NavController", ["$scope", function($scope){
+
+}]);
+
+myApp.controller("InputController", ["$scope", "$http", "AnnyangService", function($scope, $http, AnnyangService){
 
   $scope.init = function() {
     $scope.clearResults();
@@ -49,6 +61,8 @@ myApp.controller("MainController", ["$scope", "$http", "AnnyangService", functio
 
     AnnyangService.start();
   };
+
+  $scope.helloworld = "Hello World!";
 
   $scope.addResult = function(result){
     $scope.results.push({
