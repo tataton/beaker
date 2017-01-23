@@ -10,7 +10,7 @@ var User = require('../models/user');
 passport.use('local', new LocalStrategy({
   passReqToCallback: true
 }, function(req, username, attemptedPass, done){
-    console.log('hit local strategy');
+    console.log('Hit local strategy.');
   // look up the user
   User.findOne({username: username}, function(err, user){
     if (!user) {

@@ -31,6 +31,10 @@ var adminRouter = require('./routers/adminRouter');
 app.use('/admin', adminRouter);
 var loginRouter = require('./routers/loginRouter');
 app.use('/login', loginRouter);
+var userDataRouter = require('./routers/userDataRouter');
+app.use('/user_data', userDataRouter);
+var logoutRouter = require('./routers/logoutRouter');
+app.use('/logout', logoutRouter);
 
 // Server listening
 var server = app.listen(port, function() {
@@ -40,18 +44,15 @@ var server = app.listen(port, function() {
 // MongoDB/mongoose setup
 var mongoURI = "mongodb://localhost:27017/beakerDatabase";
 var MongoDB = mongoose.connect(mongoURI).connection;
-
 MongoDB.on('error', function(err) {
-    console.log('mongodb connection error:', err);
+    console.log('Mongodb connection error:', err);
 });
-
 MongoDB.once('open', function() {
-  console.log('mongodb connection open!');
+  console.log('Mongodb connection open!');
 });
 
-
+// Socket.io setup
 var io = socket(server);
-
 io.sockets.on('connection', function(socket){
   console.log('New socket id: ' + socket.id);
   socket.on('disconnect', function(){
