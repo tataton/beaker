@@ -2,7 +2,7 @@ var socket = io();
 
 var myApp = angular.module('myApp', ['ngRoute']);
 
-myApp.factory('AnnyangService', function($rootScope){
+myApp.factory('AnnyangService', function($rootScope) {
   /* Adadpted from Levi Thomason's angular-annyang
   (https://github.com/levithomason/angular-annyang). This
   factory is specifically devoted to making annyang
@@ -43,7 +43,7 @@ myApp.factory('AnnyangService', function($rootScope){
   return service;
 });
 
-myApp.controller("NavController", ["$scope", "$http", function($scope, $http){
+myApp.controller("NavController", ["$scope", "$http", function($scope, $http) {
   $http({
     method: 'GET',
     url: '/user_data'
@@ -61,16 +61,22 @@ myApp.controller("NavController", ["$scope", "$http", function($scope, $http){
   };
 }]);
 
-myApp.controller("InputController", ["$scope", "$http", "AnnyangService", function($scope, $http, AnnyangService){
+myApp.controller("InputController", ["$scope", "$http", "AnnyangService", function($scope, $http, AnnyangService) {
 
   $scope.init = function() {
     // $scope.clearResults();
 
-    AnnyangService.addCommand('hello', function(){
-      alert('Hi there!');
+    AnnyangService.addCommand('beaker', function() {
+      if ($scope.instructArray.length === 0) {
+        $scope.appendInstruct('beaker');
+      }
     });
 
-    AnnyangService.addCommand('*allSpeech', function(allSpeech){
+    AnnyangService.addCommand('clear', function() {
+      $scope.clearInstructArray();
+    });
+
+    AnnyangService.addCommand('*allSpeech', function(allSpeech) {
       console.debug(allSpeech);
       $scope.addResult(allSpeech);
     });
@@ -78,9 +84,23 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
     AnnyangService.start();
   };
 
+  $scope.clearInstructArray = function(){
+    $scope.instructArray = [];
+  };
+
+  $scope.appendInstruct = function(command) {
+    $scope.instructArray.push(command);
+    var objectToSend = {instructArray: $scope.instructArray};
+    $http({
+      method: 'POST',
+      url: '/command_update',
+      data: objectToSend
+    });
+  };
+
   $scope.helloworld = "Hello World!";
 
-  $scope.addResult = function(result){
+  $scope.addResult = function(result) {
     $scope.results.push({
       content: result,
       date: new Date()
@@ -106,6 +126,6 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
   //     $scope.results = response.data.sayingsArray;
   //   });
   // };
-
+  $scope.clearInstructArray();
   $scope.init();
 }]);

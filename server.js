@@ -59,3 +59,7 @@ io.sockets.on('connection', function(socket){
     console.log('Socket ' + socket.id + ' disconnected.');
   });
 });
+
+app.post('/command_update', function(req, res){
+  
+});
