@@ -1,5 +1,3 @@
-var socket = io();
-
 var myApp = angular.module('myApp', ['ngRoute']);
 
 myApp.factory('AnnyangService', function($rootScope) {
@@ -41,6 +39,30 @@ myApp.factory('AnnyangService', function($rootScope) {
   };
 
   return service;
+});
+
+myApp.factory('socket', function($rootScope) {
+  var socket = io.connect();
+  var socketService = {};
+  socketService.on = function(eventName, callback) {
+    socket.on(eventName, function() {
+      var args = arguments;
+      $rootScope.$apply(function() {
+        callback.apply(socket, args);
+      });
+    });
+  };
+  socketService.emit = function (eventName, data, callback) {
+    socket.emit(eventName, data, function() {
+      var args = arguments;
+      $rootScope.$apply(function() {
+        if (callback) {
+          callback.apply(socket, args);
+        }
+      });
+    });
+  };
+  return socketService;
 });
 
 myApp.controller("NavController", ["$scope", "$http", function($scope, $http) {
