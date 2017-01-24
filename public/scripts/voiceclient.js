@@ -14,55 +14,25 @@ myApp.factory('AnnyangService', function($rootScope) {
   /* Command array; do not pre-populate. New commands need
   to be added through the addCommands route, so that their
   annyang properties can be bound to $rootScope. */
-
   service.addCommand = function(phrase, callback){
     var command = {};
-
     // Wrap annyang command in scope apply:
     command[phrase] = function(args){
       $rootScope.$apply(callback(args));
     };
-
     /* Extend our commands list (copy enumerable properties)
     of command to service.commands): */
     angular.extend(service.commands, command);
-
     // Make commands in service.commands available to annyang:
     annyang.addCommands(service.commands);
     console.debug('added command "' + phrase + '"', service.commands);
   };
-
   service.start = function(){
     annyang.addCommands(service.commands);
     annyang.debug(true);
     annyang.start();
   };
-
   return service;
-});
-
-myApp.factory('socket', function($rootScope) {
-  var socket = io.connect();
-  var socketService = {};
-  socketService.on = function(eventName, callback) {
-    socket.on(eventName, function() {
-      var args = arguments;
-      $rootScope.$apply(function() {
-        callback.apply(socket, args);
-      });
-    });
-  };
-  socketService.emit = function (eventName, data, callback) {
-    socket.emit(eventName, data, function() {
-      var args = arguments;
-      $rootScope.$apply(function() {
-        if (callback) {
-          callback.apply(socket, args);
-        }
-      });
-    });
-  };
-  return socketService;
 });
 
 myApp.controller("NavController", ["$scope", "$http", function($scope, $http) {
@@ -73,7 +43,7 @@ myApp.controller("NavController", ["$scope", "$http", function($scope, $http) {
     $scope.currentUser = response.data.username;
   });
 
-  $scope.voiceLogOut = function(){
+  $scope.logMeOut = function(){
     $http({
       method: 'GET',
       url: '/logout'
@@ -108,6 +78,11 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
 
   $scope.clearInstructArray = function(){
     $scope.instructArray = [];
+    $http({
+      method: 'POST',
+      url: '/command/clearCommands',
+      data: {instructArray: []}
+    });
   };
 
   $scope.appendInstruct = function(command) {
@@ -115,7 +90,7 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
     var objectToSend = {instructArray: $scope.instructArray};
     $http({
       method: 'POST',
-      url: '/command_update',
+      url: '/command/addCommand',
       data: objectToSend
     });
   };

@@ -15,24 +15,30 @@
     <div class="container">
       <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-          <a class="navbar-brand" href="http://github.com/tataton/beaker">B.E.A.K.E.R.</a>
+          <a class="navbar-brand" href="http://github.com/tataton/beaker">B.</a>
           <p class="navbar-text navbar-right">Not Logged In</p>
         </div>
       </nav>
       <div class="jumbotron">
-        <h1>B.E.A.K.E.R.</h1>
-        <p>is a voice-activated, networked laboratory information management system. To begin,</p>
+        <h1 style="margin-top: 5px;">B.E.A.K.E.R.</h1>
+        <p style="margin-bottom: 5px;">is a voice-activated, networked laboratory information management system. To begin,</p>
       </div>
       <section class="container" ng-controller="LoginController">
         <form class="form-signin">
-          <h4 class="form-signin-heading">input your login credentials...</h4>
+          <h4 class="form-signin-heading" style="margin-top: 0; text-align: center;">log this device in for:</h4>
           <label for="username" class="sr-only">Username</label>
           <input ng-model="username" type="text" id="username" class="form-control" placeholder="Username" required autofocus>
           <label for="password" class="sr-only">Password</label>
           <input ng-model="password" type="password" id="password" class="form-control" placeholder="Password" required>
-          <h4 class="form-signin-heading">...and click one of the buttons below to sign in this device for:</h4>
-          <button ng-click="voiceLogIn()" type="button" class="btn btn-lg btn-primary btn-block">Voice Input</button>
-          <button ng-click="displayLogIn()" type="button" class="btn btn-lg btn-primary btn-block">Output Display</button>
+          <button ng-click="logIn()" type="button" class="btn btn-lg btn-primary btn-block">Voice Input</button>
+        </form>
+        <form class="form-signin">
+          <h4 class="form-signin-heading" style="margin-top: 0; text-align: center;">or</h4>
+          <label for="devicename" class="sr-only">Device Name</label>
+          <input ng-model="devicename" type="text" id="devicename" class="form-control" placeholder="Device name (your choice)" required>
+          <label for="password" class="sr-only">Password</label>
+          <input ng-model="password" type="password" id="password" class="form-control" placeholder="Workgroup Display Password" required>
+          <button ng-click="logIn('display')" type="button" class="btn btn-lg btn-primary btn-block">Output Display</button>
           <p class="help-block">Don't have an account? Contact your <a href="mailto: email@email.com">group administrator.</a></p>
         </form>
       </section>

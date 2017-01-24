@@ -2,11 +2,19 @@ var myApp = angular.module('myApp', []);
 
 myApp.controller("LoginController", ["$scope", '$http', '$window', function($scope, $http, $window){
 
-  $scope.voiceLogIn = function(){
+  $scope.logIn = function(displayUser){
+    var sentUsername;
+    if (displayUser) {
+      sentUsername = displayUser;
+      sessionStorage.setItem('deviceName', $scope.devicename);
+    } else {
+      sentUsername = $scope.username;
+    }
     var userInfo = {
-      username: $scope.username,
+      username: sentUsername,
       password: $scope.password
     };
+    console.log(userInfo);
     $http({
       method: 'POST',
       url: '/login',
@@ -17,10 +25,4 @@ myApp.controller("LoginController", ["$scope", '$http', '$window', function($sco
       $window.location.href = '/';
     });
   };
-
-  $scope.displayLogIn = function(){
-
-  };
-
-
 }]);

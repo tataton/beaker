@@ -53,13 +53,29 @@ MongoDB.once('open', function() {
 
 // Socket.io setup
 var io = socket(server);
+var devices = {};
+
+function DisplayDevice (deviceName, socketID) {
+  // Display device constructor.
+  this.deviceName = deviceName;
+  this.socketID = socketID;
+}
+
 io.sockets.on('connection', function(socket){
+  var localDeviceName;
+  socket.emit('get-devicename');
+  socket.on('set-devicename', function(devicename){
+    localDeviceName = devicename;
+    devices[localDeviceName] = socket.id;
+    console.log('Devices: ', devices);
+  });
   console.log('New socket id: ' + socket.id);
   socket.on('disconnect', function(){
     console.log('Socket ' + socket.id + ' disconnected.');
+    delete devices[localDeviceName];
   });
 });
 
-app.post('/command_update', function(req, res){
-  
+app.post('/command/:directive', function(req, res){
+
 });
