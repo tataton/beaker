@@ -88,11 +88,17 @@ myApp.controller("DisplayController", ["$scope", "$http", "SocketService", funct
   });
   SocketService.on('update-commands', function(currentCommandList){
     $scope.commandsToDisplay = currentCommandList;
+    if (currentCommandList > 0) {
+      $scope.searchResult = false;
+    }
   });
   SocketService.on('available-displays', function(availableDisplays){
     $scope.unallocatedDisplays = availableDisplays;
   });
   SocketService.on('update-notebook', function(notebookArray){
     $scope.notebookEntriesToDisplay = notebookArray;
+  });
+  SocketService.on('search-notebook', function(searchResult){
+    $scope.searchResult = searchResult;
   });
 }]);

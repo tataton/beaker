@@ -162,11 +162,15 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
           url: '/command/updateNotebook',
           data: {notebookArray: notebookEntries}
         });
-      // } else if (expectingSearchString) {
-      //   // Search
+      } else if (expectingSearchString) {
+        $http({
+          method: 'POST',
+          url: '/command/searchNotebook',
+          data: {searchString: allSpeech}
+        });
+        clearAll();
       }
       console.debug(allSpeech);
-      // $scope.addResult(allSpeech);
     });
 
     AnnyangService.start({autoRestart: true, continuous: false});
@@ -178,6 +182,7 @@ myApp.controller("InputController", ["$scope", "$http", "AnnyangService", functi
     availableDisplayArray = [];
     expectingDisplay = false;
     expectingNotebookEntries = false;
+    expectingSearchString = false;
     $http({
       method: 'POST',
       url: '/command/updateCommands',

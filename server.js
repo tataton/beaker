@@ -141,5 +141,23 @@ app.post('/command/:directive', function(req, res){
       }
       res.sendStatus(200);
       break;
+    case 'searchNotebook':
+      var Note = require('./models/notebook');
+      var searchTerm = new RegExp(req.body.searchString);
+      Note.findOne({entries: {$in: [searchTerm]}}, function(err, searchResult) {
+        if (err) {
+          console.log(err);
+          res.sendStatus(500);
+        } else {
+          console.log(searchResult);
+          for (i = 0; i < devices.length; i++) {
+            if (devices[i].assignedTo == req.user.username) {
+              io.to(devices[i].socketID).emit('search-notebook', searchResult);
+            }
+          }
+          res.sendStatus(200);
+        }
+      });
+      break;
   }
 });

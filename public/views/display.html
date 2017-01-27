@@ -35,7 +35,15 @@
           </div>
           <div class="col-sm-7">
             <h3>Output Area</h3>
-            <p ng-repeat="notebookEntry in notebookEntriesToDisplay">{{notebookEntry}}</p>
+            <div ng-show="notebookEntriesToDisplay">
+              <p ng-repeat="notebookEntry in notebookEntriesToDisplay">{{notebookEntry}}</p>
+            </div>
+            <div ng-show="searchResult">
+              <h4>Search Result:</h4>
+              <p>timestamp: {{searchResult.timestamp}}</p>
+              <p>notebook entries:</p>
+              <p ng-repeat="entry in searchResult.entries">{{entry}}<p>
+            </div>
           </div>
         </div>
       </div>
