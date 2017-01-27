@@ -21,10 +21,23 @@
         <p class="navbar-text navbar-right">Device name: </p>
       </div>
     </nav>
-    <section ng-controller="DisplayController">
-      <div class="container">
-        <h1>TEST</h1>
-        {{helloworld}}
+    <section ng-controller="DisplayController" style="full-height">
+      <div class="container full-height">
+        <div class="page-header">
+          <h2 ng-hide="associatedUser" style="text-align: center;">Waiting for voice user to connect.</h2>
+          <h2 ng-show="associatedUser" style="text-align: center;">Receiving instructions from {{associatedUser}}.</h2>
+        </div>
+        <div class="row full-height">
+          <div class="col-sm-5 input-area">
+            <h3>Input Area</h3>
+            <p ng-repeat="command in commandsToDisplay">Command: {{command}}</p>
+            <p ng-repeat="display in unallocatedDisplays">Display: {{display}}</p>
+          </div>
+          <div class="col-sm-7">
+            <h3>Output Area</h3>
+            <p ng-repeat="notebookEntry in notebookEntriesToDisplay">{{notebookEntry}}</p>
+          </div>
+        </div>
       </div>
     </section>
   </body>

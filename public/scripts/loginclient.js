@@ -14,7 +14,6 @@ myApp.controller("LoginController", ["$scope", '$http', '$window', function($sco
       username: sentUsername,
       password: $scope.password
     };
-    console.log(userInfo);
     $http({
       method: 'POST',
       url: '/login',

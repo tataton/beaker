@@ -1,4 +1,28 @@
-var myApp = angular.module('myApp', ['ngRoute']);
+var myApp = angular.module('myApp', []);
+
+// Add array comparison method 'equals' to Array prototype:
+Array.prototype.equals = function(array){
+    // If the other array is a falsy value, return false.
+    if (!array)
+        return false;
+    // If arrays have different length, return false.
+    if (this.length != array.length)
+        return false;
+    for (var i = 0, l=this.length; i < l; i++) {
+        // Check if we have nested arrays:
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // Recurse into the nested arrays:
+            if (!this[i].equals(array[i]))
+                return false;
+        } else if (this[i] != array[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+};
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 
 myApp.factory('AnnyangService', function($rootScope) {
   /* Adadpted from Levi Thomason's angular-annyang
@@ -55,74 +79,133 @@ myApp.controller("NavController", ["$scope", "$http", function($scope, $http) {
 
 myApp.controller("InputController", ["$scope", "$http", "AnnyangService", function($scope, $http, AnnyangService) {
 
+  var expectingDisplay = false;
+  var expectingNotebookEntries = false;
+  var expectingSearchString = false;
+  var availableDisplayArray = [];
+  var myDisplayArray = [];
+  var notebookEntries = [];
+
   $scope.init = function() {
     // $scope.clearResults();
 
     AnnyangService.addCommand('beaker', function() {
       if ($scope.instructArray.length === 0) {
-        $scope.appendInstruct('beaker');
+        appendInstruct('beaker');
       }
     });
 
     AnnyangService.addCommand('clear', function() {
-      $scope.clearInstructArray();
+      clearAll();
+    });
+
+    AnnyangService.addCommand('display', function() {
+      console.log('Hit display command set.');
+      if ($scope.instructArray.equals(['beaker'])) {
+        appendInstruct('display');
+        expectingDisplay = true;
+        $http({
+          method: 'POST',
+          url: '/command/getDisplays',
+          data: {}
+        }).then(function(response){
+          availableDisplayArray = response.data.displayArray;
+        });
+      }
+    });
+
+    AnnyangService.addCommand('notebook', function(){
+      console.log('Hit notebook command set.');
+      if ($scope.instructArray.equals(['beaker'])) {
+        appendInstruct('notebook');
+        expectingNotebookEntries = true;
+      }
+    });
+
+    AnnyangService.addCommand('stop notebook', function(){
+      console.log('Ending notebook entries.');
+      $http({
+        method: 'POST',
+        url: '/notebook',
+        data: {
+          timestamp: new Date(),
+          entries: notebookEntries
+        }
+      }).then(function(){
+        clearAll();
+      });
+    });
+
+    AnnyangService.addCommand('search', function(){
+      console.log('Notebook search.');
+      if ($scope.instructArray.equals(['beaker'])) {
+        appendInstruct('search');
+        expectingSearchString = true;
+      }
     });
 
     AnnyangService.addCommand('*allSpeech', function(allSpeech) {
+      if ((expectingDisplay) && (availableDisplayArray.includes(allSpeech))) {
+        var displayToActivate = {display: allSpeech};
+        $http({
+          method: 'POST',
+          url: '/command/activateDisplay',
+          data: displayToActivate
+        }).then(function(){
+          clearAll();
+          myDisplayArray.push(allSpeech);
+        });
+      } else if (expectingNotebookEntries) {
+        notebookEntries.push(allSpeech);
+        $http({
+          method: 'POST',
+          url: '/command/updateNotebook',
+          data: {notebookArray: notebookEntries}
+        });
+      // } else if (expectingSearchString) {
+      //   // Search
+      }
       console.debug(allSpeech);
-      $scope.addResult(allSpeech);
+      // $scope.addResult(allSpeech);
     });
 
-    AnnyangService.start();
+    AnnyangService.start({autoRestart: true, continuous: false});
   };
 
-  $scope.clearInstructArray = function(){
+  var clearAll = function(){
     $scope.instructArray = [];
+    notebookEntries = [];
+    availableDisplayArray = [];
+    expectingDisplay = false;
+    expectingNotebookEntries = false;
     $http({
       method: 'POST',
-      url: '/command/clearCommands',
+      url: '/command/updateCommands',
       data: {instructArray: []}
+    });
+    $http({
+      method: 'POST',
+      url: '/command/updateNotebook',
+      data: {notebookArray: []}
     });
   };
 
-  $scope.appendInstruct = function(command) {
+   var appendInstruct = function(command) {
     $scope.instructArray.push(command);
     var objectToSend = {instructArray: $scope.instructArray};
     $http({
       method: 'POST',
-      url: '/command/addCommand',
+      url: '/command/updateCommands',
       data: objectToSend
     });
   };
 
-  $scope.helloworld = "Hello World!";
+  $scope.notices = [
+    "Voice client activated.",
+    "If browser requests permission to access microphone, press 'Allow'.",
+    "Red circle in the browser tab means B.E.A.K.E.R. is listening."
+  ];
 
-  $scope.addResult = function(result) {
-    $scope.results.push({
-      content: result,
-      date: new Date()
-    });
-  };
-
-  // $scope.clearResults = function(){
-  //   var objectToSend = {sayingsArray: $scope.results};
-  //   $http({
-  //     method: 'POST',
-  //     url: '/sayings',
-  //     data: objectToSend
-  //   }).then(function(){
-  //     $scope.results = [];
-  //   });
-  // };
-  //
-  // $scope.pastResults = function(){
-  //   $http({
-  //     method: 'GET',
-  //     url: '/sayings'
-  //   }).then(function(response){
-  //     $scope.results = response.data.sayingsArray;
-  //   });
-  // };
-  $scope.clearInstructArray();
+  clearAll();
   $scope.init();
 }]);
